@@ -28,7 +28,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 #editor {
   display: flex;
   justify-content: space-between;
@@ -47,35 +47,31 @@ textarea {
   padding: 10px;
   box-sizing: border-box;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 10px;
   resize: none;
 }
 
 .markdown-preview {
+  font-family: Arial, Helvetica, sans-serif;
   width: 48%;
   padding: 20px;
   box-sizing: border-box;
   overflow-y: auto;
   height: 100%;
+  border: 1px solid #ccc;
+  border-radius: 10px;
 }
 
 .markdown-preview h1 {
   font-size: 2em;
-  color: #333;
-  border-bottom: 2px solid #ccc;
-  padding-bottom: 0.5em;
 }
 
 .markdown-preview h2 {
   font-size: 1.75em;
-  color: #666;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 0.3em;
 }
 
 .markdown-preview p {
   margin: 1em 0;
-  color: #444;
 }
 
 .markdown-preview ul {
@@ -89,32 +85,26 @@ textarea {
 
 .markdown-preview strong {
   font-weight: bold;
-  color: #000;
 }
 
 .markdown-preview em {
   font-style: italic;
-  color: #888;
 }
 
 .markdown-preview pre {
-  background-color: #f4f4f4;
   padding: 10px;
   border-radius: 5px;
   overflow-x: auto;
 }
 
 .markdown-preview code {
-  background-color: #f4f4f4;
   padding: 2px 4px;
   border-radius: 3px;
   font-family: 'Courier New', Courier, monospace;
-  color: #d6336c;
-  background-color: #888;
+  background-color: #666;
 }
 
-code {
-  font-family: 'Courier New', Courier, monospace;
-  color: #d6336c;
+.markdown-preview table {
+  border: 2px #808080 solid;
 }
 </style>
