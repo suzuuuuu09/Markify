@@ -105,6 +105,28 @@ textarea {
 }
 
 .markdown-preview table {
-  border: 2px #808080 solid;
+  border-collapse: collapse;
+}
+
+/* 表の1番上のセル */
+.markdown-preview table th {
+  border: solid 1px;
+  padding: 0.5px 12px;
+  font-weight: bold;
+  background-color: #333;
+}
+
+/* 表のセル */
+.markdown-preview table td {
+  border: solid 1px;
+  padding: 0.5px 12px;
+}
+
+.markdown-preview tr:nth-child(odd) {
+  background-color: #444;
+}
+
+.markdown-preview tr:nth-child(even) {
+  background-color: #333;
 }
 </style>
