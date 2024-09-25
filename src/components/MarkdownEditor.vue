@@ -1,15 +1,15 @@
 <template>
   <div id="tool-bar">
-    <button @mousedown="boldText" aria-label="Bold (Ctrl+Shift+B)">
+    <button class="icon-button"  @mousedown="boldText" aria-label="Bold (Ctrl+Shift+B)">
       <!-- BoldIcon -->
-      <img class="button-icon" src="@/assets/bold.svg" alt="bold"
+      <img src="@/assets/bold.svg" alt="bold"
         :width="width"
         :height="height"
       >
     </button>
-    <button @mousedown="italicText" aria-label="Italic (Ctrl+Shift+I)">
+    <button class="icon-button" @mousedown="italicText" aria-label="Italic (Ctrl+Shift+I)">
       <!-- ItalicIcon -->
-       <img class="button-icon" src="@/assets/italic.svg" alt="italic"
+       <img src="@/assets/italic.svg" alt="italic"
         :width="width"
         :height="height"
        >
@@ -40,7 +40,7 @@ export default {
     update: _.debounce(function (e) {
       this.input = e.target.value
     }, 300),
-    boldText(event) {
+    wrapTextWithTags(event, tagText, placeholderText = 'text') {
       event.preventDefault();
       event.stopPropagation();
 
@@ -53,49 +53,70 @@ export default {
 
       // 選択されているテキスト
       const selectedText = this.input.substring(start, end);
-
-      // 選択されているテキストがある場合は、そのテキストを**で囲む
+      
+      // 選択されているテキストがある場合は、そのテキストをタグで囲むまたは消す
       if (selectedText.length > 0) {
-        this.input = 
-        this.input.substring(0, start) + 
-        `**${selectedText}**` + 
-        this.input.substring(end);
-      } 
-      // 選択されていない場合は、カーソル位置に**を挿入し、カーソルをその間に移動
-      else {
-        const innerText = "**strong text**"
+        const beforeSelectedText = textarea.value.substring(start - tagText.length, start);
+        const afterSelectedText = textarea.value.substring(end, end + tagText.length);
+        if (beforeSelectedText === tagText && afterSelectedText === tagText) {
+          this.input = 
+            this.input.substring(0, start - tagText.length) +
+            this.input.substring(start, end) +
+            this.input.substring(end + tagText.length);
+
+          // テキストの選択をする
+          this.$nextTick(() => {
+            textarea.selectionStart = start - tagText.length;
+            textarea.selectionEnd = end - tagText.length;
+          });
+        } else {
+          this.input = 
+            this.input.substring(0, start) + 
+            `${tagText}${selectedText}${tagText}` + 
+            this.input.substring(end);
+
+          // テキストの選択をする
+          this.$nextTick(() => {
+            textarea.selectionStart = start + tagText.length;
+            textarea.selectionEnd = end + tagText.length;
+          });
+        }
+      } else {
+        // 選択されていない場合は、カーソル位置にタグを挿入し、カーソルをその間に移動
         this.input = 
           this.input.substring(0, start) + 
-          innerText + 
+          `${tagText}${placeholderText}${tagText}` + 
           this.input.substring(end);
 
-        // カーソルを**の間に移動
+        // カーソルをタグの間に移動
         this.$nextTick(() => {
-          textarea.selectionStart = textarea.selectionEnd = start + 2;
-          textarea.selectionEnd = start + 2 + 11;
-
+          textarea.selectionStart = start + tagText.length;
+          textarea.selectionEnd = start + tagText.length + placeholderText.length;
         });
       }
+      textarea.focus();
     },
+    // ボールド用の関数
+    boldText(event) {
+      this.wrapTextWithTags(event, '**', 'strong text');
+    },
+    // イタリック用の関数
     italicText(event) {
-      // ボタンをクリックしてもテキストの選択が解除されないようにする
-      event.preventDefault();
-      event.stopPropagation();
-
-      console.log("Italic Text button clicked");
+      this.wrapTextWithTags(event, '_', 'emphasized text');
     }
   },
   props: {
     width: {
       type: String,
-      default: "100"
+      default: "10"
     },
     height: {
       type: String,
-      default: "100"
+      default: "10"
     }
   }
 }
+
 </script>
 
 <style>
@@ -120,6 +141,13 @@ textarea {
   border: 1px solid #ccc;
   border-radius: 10px;
   resize: none;
+}
+
+.icon-button{
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  margin: 0 5px;
 }
 
 .markdown-preview {
