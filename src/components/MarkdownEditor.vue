@@ -5,10 +5,10 @@
       <button class="icon-button" @mousedown="openTextFile" aria-label="Open Text File (Ctrl+Shift+O)">
         <Icon icon="material-symbols:file-open-outline" :width="width" :height="height" />
       </button>
-      <input 
-        type="file" 
-        ref="fileInput" 
-        style="display: none;" 
+      <input
+        type="file"
+        ref="fileInput"
+        style="display: none;"
         @change="handleFileChange"
         accept=".md, .txt"
       />
@@ -73,13 +73,13 @@ export default {
 
       // 選択されているテキスト
       const selectedText = this.input.substring(start, end)
-    
+
       // 選択されているテキストがある場合は、そのテキストをタグで囲むまたは消す
       if (selectedText.length > 0) {
         const beforeSelectedText = textarea.value.substring(start - tagText.length, start)
         const afterSelectedText = textarea.value.substring(end, end + tagText.length)
         if (beforeSelectedText === tagText && afterSelectedText === tagText) {
-          this.input = 
+          this.input =
             this.input.substring(0, start - tagText.length) +
             this.input.substring(start, end) +
             this.input.substring(end + tagText.length)
@@ -90,9 +90,9 @@ export default {
             textarea.selectionEnd = end - tagText.length
           })
         } else {
-          this.input = 
-            this.input.substring(0, start) + 
-            `${tagText}${selectedText}${tagText}` + 
+          this.input =
+            this.input.substring(0, start) +
+            `${tagText}${selectedText}${tagText}` +
             this.input.substring(end)
 
           // テキストの選択をする
@@ -103,9 +103,9 @@ export default {
         }
       } else {
         // 選択されていない場合は、カーソル位置にタグを挿入し、カーソルをその間に移動
-        this.input = 
-          this.input.substring(0, start) + 
-          `${tagText}${placeholderText}${tagText}` + 
+        this.input =
+          this.input.substring(0, start) +
+          `${tagText}${placeholderText}${tagText}` +
           this.input.substring(end)
 
         // カーソルをタグの間に移動
@@ -200,6 +200,7 @@ textarea {
   border: none;
   outline: none;
   background-color: #f0f0f3;
+  color: #333;
 }
 
 .icon-button{

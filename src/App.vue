@@ -1,13 +1,11 @@
 <template>
-  <MarkdownEditor />
+  <v-app>
+    <v-main>
+      <MarkdownEditor/>
+    </v-main>
+  </v-app>
 </template>
 
-<script>
-import MarkdownEditor from './components/MarkdownEditor.vue'
-
-export default {
-  components: {
-    MarkdownEditor
-  }
-}
+<script setup>
+  import MarkdownEditor from './components/MarkdownEditor.vue'
 </script>
