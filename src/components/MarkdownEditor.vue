@@ -1,40 +1,56 @@
 <template>
-  <div id="tool-bar">
-    <button class="icon-button"  @mousedown="boldText" aria-label="Bold (Ctrl+Shift+B)">
-      <!-- BoldIcon -->
-      <img src="@/assets/bold.svg" alt="bold"
-        :width="width"
-        :height="height"
-      >
-    </button>
-    <button class="icon-button" @mousedown="italicText" aria-label="Italic (Ctrl+Shift+I)">
-      <!-- ItalicIcon -->
-       <img src="@/assets/italic.svg" alt="italic"
-        :width="width"
-        :height="height"
-       >
-    </button>
-  </div>
-  <div id="editor">
-    <textarea id="inputTextarea" v-model="input" @input="update" @mouseup="handleTextSelection"></textarea>
-    <div v-html="compiledMarkdown" class="markdown-preview"></div>
+  <div id="container">
+    <div id="toolbar">
+      <!-- Bold -->
+      <button class="icon-button"  @mousedown="boldText" aria-label="Bold (Ctrl+Shift+B)">
+        <BoldIcon :width="width" :height="height" />
+      </button>
+      <!-- Italic -->
+      <button class="icon-button" @mousedown="italicText" aria-label="Italic (Ctrl+Shift+I)">
+        <ItalicIcon :width="width" :height="height" />
+      </button>
+      <!-- Strikethrough -->
+      <button class="icon-button" @mousedown="strikethroughText" aria-label="Strikethrough (Ctrl+Shift+S)">
+        <StrikethroughIcon :width="width" :height="height" />
+      </button>
+      <!-- Heading -->
+      <button class="icon-button" @mousedown="headingText" aria-label="Heading (Ctrk+Shift+H)">
+        <HeadingIcon :width="width" :height="height" />
+      </button>
+    </div>
+    <div id="editor">
+      <textarea id="input-textarea" v-model="input" @input="update"></textarea>
+      <div v-html="compiledMarkdown" class="markdown-preview"></div>
+    </div>
   </div>
 </template>
 
 <script>
 import { marked } from 'marked'
 import _ from 'lodash'
+import { 
+  BoldIcon, 
+  ItalicIcon, 
+  StrikethroughIcon, 
+  HeadingIcon 
+} from 'lucide-vue-next'
 
 export default {
   data() {
     return {
-      input: '# Hello World\n\nThis is **bold** text and _italic_ text.' // v-modelで管理されているデータ
+      input: '# Hello World\n\nThis is **bold** text and _italic_ text.'
     }
   },
   computed: {
     compiledMarkdown() {
       return marked(this.input, { sanitize: true })
     }
+  },
+  components: {
+    BoldIcon,
+    ItalicIcon,
+    StrikethroughIcon,
+    HeadingIcon
   },
   methods: {
     update: _.debounce(function (e) {
@@ -45,7 +61,7 @@ export default {
       event.stopPropagation();
 
       // テキストエリアのDOM要素を取得
-      const textarea = document.getElementById("inputTextarea");
+      const textarea = document.getElementById("input-textarea");
 
       // カーソルの開始位置と終了位置を取得
       const start = textarea.selectionStart;
@@ -53,7 +69,7 @@ export default {
 
       // 選択されているテキスト
       const selectedText = this.input.substring(start, end);
-      
+    
       // 選択されているテキストがある場合は、そのテキストをタグで囲むまたは消す
       if (selectedText.length > 0) {
         const beforeSelectedText = textarea.value.substring(start - tagText.length, start);
@@ -103,16 +119,20 @@ export default {
     // イタリック用の関数
     italicText(event) {
       this.wrapTextWithTags(event, '_', 'emphasized text');
-    }
+    },
+    // 取り消し線
+    strikethroughText(event) {
+      this.wrapTextWithTags(event, '~~', 'squiggle text');
+    },
   },
   props: {
     width: {
       type: String,
-      default: "10"
+      default: "15"
     },
     height: {
       type: String,
-      default: "10"
+      default: "15"
     }
   }
 }
@@ -120,27 +140,47 @@ export default {
 </script>
 
 <style>
+
+#container {
+  display:flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+#toolbar {
+  display: flex;
+  background-color: #526070;
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+  overflow: hidden;
+}
+
 #editor {
   display: flex;
   justify-content: space-between;
-  width: 80vw;
-  height: 100vh;
-  padding: 20px;
+  width: 100%;
+  height: 100%;
   box-sizing: border-box;
   margin: auto;
+  flex-wrap: wrap;
+  overflow: hidden;
 }
 
 /* テキスト入力 */
 textarea {
-  width: 48%;
+  width: 50%;
   height: 100%;
   font-size: 16px;
-  margin-right: 2%;
   padding: 10px;
   box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 10px;
   resize: none;
+  border: none;
+  outline: none;
+  background-color: #0062a1;
 }
 
 .icon-button{
@@ -152,13 +192,12 @@ textarea {
 
 .markdown-preview {
   font-family: Arial, Helvetica, sans-serif;
-  width: 48%;
+  width: 50%;
   padding: 20px;
   box-sizing: border-box;
   overflow-y: auto;
   height: 100%;
-  border: 1px solid #ccc;
-  border-radius: 10px;
+  background-color: #695779;
 }
 
 .markdown-preview h1 {
@@ -169,9 +208,9 @@ textarea {
   font-size: 1.75em;
 }
 
-.markdown-preview p {
+/* .markdown-preview p {
   margin: 1em 0;
-}
+} */
 
 .markdown-preview ul {
   padding-left: 20px;
@@ -228,4 +267,5 @@ textarea {
 .markdown-preview tr:nth-child(even) {
   background-color: #333;
 }
+
 </style>
