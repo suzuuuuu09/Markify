@@ -1,21 +1,32 @@
 <template>
   <div id="container">
     <div id="toolbar">
+      <!-- OpenTextFile -->
+      <button class="icon-button" @mousedown="openTextFile" aria-label="Open Text File (Ctrl+Shift+O)">
+        <Icon icon="material-symbols:file-open-outline" :width="width" :height="height" />
+      </button>
+      <input 
+        type="file" 
+        ref="fileInput" 
+        style="display: none;" 
+        @change="handleFileChange"
+        accept=".md, .txt"
+      />
       <!-- Bold -->
       <button class="icon-button"  @mousedown="boldText" aria-label="Bold (Ctrl+Shift+B)">
-        <BoldIcon :width="width" :height="height" />
+        <Icon icon="octicon:bold-16" :width="width" :height="height" />
       </button>
       <!-- Italic -->
       <button class="icon-button" @mousedown="italicText" aria-label="Italic (Ctrl+Shift+I)">
-        <ItalicIcon :width="width" :height="height" />
+        <Icon icon="bx:italic" :width="width" :height="height" />
       </button>
       <!-- Strikethrough -->
       <button class="icon-button" @mousedown="strikethroughText" aria-label="Strikethrough (Ctrl+Shift+S)">
-        <StrikethroughIcon :width="width" :height="height" />
+        <Icon icon="mingcute:strikethrough-fill" :width="width" :height="height" />
       </button>
       <!-- Heading -->
       <button class="icon-button" @mousedown="headingText" aria-label="Heading (Ctrk+Shift+H)">
-        <HeadingIcon :width="width" :height="height" />
+        <Icon icon="gridicons:heading" :width="width" :height="height" />
       </button>
     </div>
     <div id="editor">
@@ -28,17 +39,13 @@
 <script>
 import { marked } from 'marked'
 import _ from 'lodash'
-import { 
-  BoldIcon, 
-  ItalicIcon, 
-  StrikethroughIcon, 
-  HeadingIcon 
-} from 'lucide-vue-next'
+import { Icon } from '@iconify/vue'
 
 export default {
   data() {
     return {
-      input: '# Hello World\n\nThis is **bold** text and _italic_ text.'
+      input: '# Hello World\n\nThis is **bold** text and _italic_ text.',
+      fileContent: '',
     }
   },
   computed: {
@@ -47,92 +54,103 @@ export default {
     }
   },
   components: {
-    BoldIcon,
-    ItalicIcon,
-    StrikethroughIcon,
-    HeadingIcon
+    Icon,
   },
   methods: {
     update: _.debounce(function (e) {
       this.input = e.target.value
     }, 300),
     wrapTextWithTags(event, tagText, placeholderText = 'text') {
-      event.preventDefault();
-      event.stopPropagation();
+      event.preventDefault()
+      event.stopPropagation()
 
       // テキストエリアのDOM要素を取得
-      const textarea = document.getElementById("input-textarea");
+      const textarea = document.getElementById("input-textarea")
 
       // カーソルの開始位置と終了位置を取得
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
+      const start = textarea.selectionStart
+      const end = textarea.selectionEnd
 
       // 選択されているテキスト
-      const selectedText = this.input.substring(start, end);
+      const selectedText = this.input.substring(start, end)
     
       // 選択されているテキストがある場合は、そのテキストをタグで囲むまたは消す
       if (selectedText.length > 0) {
-        const beforeSelectedText = textarea.value.substring(start - tagText.length, start);
-        const afterSelectedText = textarea.value.substring(end, end + tagText.length);
+        const beforeSelectedText = textarea.value.substring(start - tagText.length, start)
+        const afterSelectedText = textarea.value.substring(end, end + tagText.length)
         if (beforeSelectedText === tagText && afterSelectedText === tagText) {
           this.input = 
             this.input.substring(0, start - tagText.length) +
             this.input.substring(start, end) +
-            this.input.substring(end + tagText.length);
+            this.input.substring(end + tagText.length)
 
           // テキストの選択をする
           this.$nextTick(() => {
-            textarea.selectionStart = start - tagText.length;
-            textarea.selectionEnd = end - tagText.length;
-          });
+            textarea.selectionStart = start - tagText.length
+            textarea.selectionEnd = end - tagText.length
+          })
         } else {
           this.input = 
             this.input.substring(0, start) + 
             `${tagText}${selectedText}${tagText}` + 
-            this.input.substring(end);
+            this.input.substring(end)
 
           // テキストの選択をする
           this.$nextTick(() => {
-            textarea.selectionStart = start + tagText.length;
-            textarea.selectionEnd = end + tagText.length;
-          });
+            textarea.selectionStart = start + tagText.length
+            textarea.selectionEnd = end + tagText.length
+          })
         }
       } else {
         // 選択されていない場合は、カーソル位置にタグを挿入し、カーソルをその間に移動
         this.input = 
           this.input.substring(0, start) + 
           `${tagText}${placeholderText}${tagText}` + 
-          this.input.substring(end);
+          this.input.substring(end)
 
         // カーソルをタグの間に移動
         this.$nextTick(() => {
-          textarea.selectionStart = start + tagText.length;
-          textarea.selectionEnd = start + tagText.length + placeholderText.length;
-        });
+          textarea.selectionStart = start + tagText.length
+          textarea.selectionEnd = start + tagText.length + placeholderText.length
+        })
       }
-      textarea.focus();
+      textarea.focus()
     },
     // ボールド用の関数
     boldText(event) {
-      this.wrapTextWithTags(event, '**', 'strong text');
+      this.wrapTextWithTags(event, '**', 'strong text')
     },
     // イタリック用の関数
     italicText(event) {
-      this.wrapTextWithTags(event, '_', 'emphasized text');
+      this.wrapTextWithTags(event, '_', 'emphasized text')
     },
     // 取り消し線
     strikethroughText(event) {
-      this.wrapTextWithTags(event, '~~', 'squiggle text');
+      this.wrapTextWithTags(event, '~~', 'squiggle text')
+    },
+    openTextFile(){
+      this.$refs.fileInput.click()
+    },
+    handleFileChange(event) {
+      const file = event.target.files[0]
+      if (file) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          this.fileContent = e.target.result
+          this.input = this.fileContent
+        }
+        reader.readAsText(file)
+      }
     },
   },
   props: {
     width: {
       type: String,
-      default: "15"
+      default: "1.5em"
     },
     height: {
       type: String,
-      default: "15"
+      default: "2em"
     }
   }
 }
@@ -151,9 +169,9 @@ export default {
 
 #toolbar {
   display: flex;
-  background-color: #526070;
+  background-color: #42474e;
   width: 100%;
-  padding: 10px;
+  padding: 5px;
   box-sizing: border-box;
   flex-wrap: wrap;
   overflow: hidden;
@@ -168,6 +186,7 @@ export default {
   margin: auto;
   flex-wrap: wrap;
   overflow: hidden;
+  color: #333;
 }
 
 /* テキスト入力 */
@@ -180,7 +199,7 @@ textarea {
   resize: none;
   border: none;
   outline: none;
-  background-color: #0062a1;
+  background-color: #f0f0f3;
 }
 
 .icon-button{
@@ -197,7 +216,7 @@ textarea {
   box-sizing: border-box;
   overflow-y: auto;
   height: 100%;
-  background-color: #695779;
+  background-color: #dfe3eb;
 }
 
 .markdown-preview h1 {
