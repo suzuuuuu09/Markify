@@ -1,10 +1,11 @@
 <template>
   <div id="container">
-    <div id="toolbar">
+    <v-toolbar density="compact" id="toolbar">
       <!-- OpenTextFile -->
-      <button class="icon-button" @mousedown="openTextFile" aria-label="Open Text File (Ctrl+Shift+O)">
+      <v-btn icon variant="text" class="icon-button" @mousedown="openTextFile" aria-label="Open Text File (Ctrl+Shift+O)">
         <Icon icon="material-symbols:file-open-outline" :width="width" :height="height" />
-      </button>
+        <v-tooltip activator="parent" location="bottom">Open Text File (Ctrl+Shift+O)</v-tooltip>
+      </v-btn>
       <input
         type="file"
         ref="fileInput"
@@ -12,23 +13,31 @@
         @change="handleFileChange"
         accept=".md, .txt"
       />
+
       <!-- Bold -->
-      <button class="icon-button"  @mousedown="boldText" aria-label="Bold (Ctrl+Shift+B)">
+      <v-btn icon variant="text" class="icon-button"  @mousedown="boldText" aria-label="Bold (Ctrl+Shift+B)">
         <Icon icon="octicon:bold-16" :width="width" :height="height" />
-      </button>
+        <v-tooltip activator="parent" location="bottom">Bold (Ctrl+Shift+B)</v-tooltip>
+      </v-btn>
+
       <!-- Italic -->
-      <button class="icon-button" @mousedown="italicText" aria-label="Italic (Ctrl+Shift+I)">
+      <v-btn icon variant="text" class="icon-button" @mousedown="italicText" aria-label="Italic (Ctrl+Shift+I)">
         <Icon icon="bx:italic" :width="width" :height="height" />
-      </button>
+        <v-tooltip activator="parent" location="bottom">Italic (Ctrl+Shift+I)</v-tooltip>
+      </v-btn>
+
       <!-- Strikethrough -->
-      <button class="icon-button" @mousedown="strikethroughText" aria-label="Strikethrough (Ctrl+Shift+S)">
+      <v-btn icon variant="text" class="icon-button" @mousedown="strikethroughText" aria-label="Strikethrough (Ctrl+Shift+S)">
         <Icon icon="mingcute:strikethrough-fill" :width="width" :height="height" />
-      </button>
+        <v-tooltip activator="parent" location="bottom">Strikethrough (Ctrl+Shift+S)</v-tooltip>
+      </v-btn>
+
       <!-- Heading -->
-      <button class="icon-button" @mousedown="headingText" aria-label="Heading (Ctrk+Shift+H)">
+      <v-btn icon variant="text" class="icon-button" @mousedown="headingText" aria-label="Heading (Ctrl+Shift+H)">
         <Icon icon="gridicons:heading" :width="width" :height="height" />
-      </button>
-    </div>
+        <v-tooltip activator="parent" location="bottom">Heading (Ctrl+Shift+H)</v-tooltip>
+      </v-btn>
+    </v-toolbar>
     <div id="editor">
       <textarea id="input-textarea" v-model="input" @input="update"></textarea>
       <div v-html="compiledMarkdown" class="markdown-preview"></div>
@@ -40,12 +49,12 @@
 import { marked } from 'marked'
 import _ from 'lodash'
 import { Icon } from '@iconify/vue'
+import { VTooltip } from 'vuetify/components/VTooltip'
 
 export default {
   data() {
     return {
       input: '# Hello World\n\nThis is **bold** text and _italic_ text.',
-      fileContent: '',
     }
   },
   computed: {
@@ -55,6 +64,7 @@ export default {
   },
   components: {
     Icon,
+    VTooltip,
   },
   methods: {
     update: _.debounce(function (e) {
@@ -136,8 +146,7 @@ export default {
       if (file) {
         const reader = new FileReader()
         reader.onload = (e) => {
-          this.fileContent = e.target.result
-          this.input = this.fileContent
+          this.input = e.target.result
         }
         reader.readAsText(file)
       }
@@ -150,7 +159,7 @@ export default {
     },
     height: {
       type: String,
-      default: "2em"
+      default: "1.5em"
     }
   }
 }
@@ -222,10 +231,12 @@ textarea {
 
 .markdown-preview h1 {
   font-size: 2em;
+  text-decoration: underline 2px;
 }
 
 .markdown-preview h2 {
   font-size: 1.75em;
+  text-decoration: underline 1.5px;
 }
 
 /* .markdown-preview p {
